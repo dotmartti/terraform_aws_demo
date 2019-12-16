@@ -42,23 +42,6 @@ resource "aws_security_group" "gcapp_sg" {
     }
 }
 
-# get the latest ubuntu 18.04 LTS image
-data "aws_ami" "ubuntu" {
-  most_recent = true
-
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
-  }
-
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-
-  owners = ["099720109477"] # Canonical
-}
-
 resource "aws_instance" "gcapp" {
     count           = 1
     #ami             = "ami-005bc7d72deb72a3d"
