@@ -1,0 +1,55 @@
+{
+  "all_files": [
+    {
+      "name": "recipes/default.rb",
+      "path": "recipes/default.rb",
+      "checksum": "dd450ed5d13409a4740664021ceddfcb",
+      "specificity": "default"
+    },
+    {
+      "name": "root_files/metadata.rb",
+      "path": "metadata.rb",
+      "checksum": "f47d730a0fe614f7ac1295d91793421f",
+      "specificity": "default"
+    }
+  ],
+  "metadata": {
+    "name": "gcapp",
+    "description": "Cookbook for GC webapp",
+    "long_description": "",
+    "maintainer": "Martti Remmelgas",
+    "maintainer_email": "martti.remmelgas@gmail.com",
+    "license": "Apache-2.0",
+    "platforms": {
+
+    },
+    "dependencies": {
+
+    },
+    "providing": {
+      "gcapp": ">= 0.0.0"
+    },
+    "recipes": {
+      "gcapp": ""
+    },
+    "version": "1.0.0",
+    "source_url": "",
+    "issues_url": "",
+    "privacy": false,
+    "chef_versions": [
+
+    ],
+    "ohai_versions": [
+
+    ],
+    "gems": [
+
+    ]
+  },
+  "version": "1.0.0",
+  "name": "gcapp-1.0.0",
+  "cookbook_name": "gcapp",
+  "frozen?": false,
+  "chef_type": "cookbook_version",
+  "json_class": "Chef::CookbookVersion"
+}

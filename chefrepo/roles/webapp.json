@@ -1,0 +1,8 @@
+{
+  "name": "webapp",
+  "description": "Role for GC web app",
+  "run_list": [
+    "recipe[chef-client]",
+    "recipe[gcapp]"
+  ]
+}
