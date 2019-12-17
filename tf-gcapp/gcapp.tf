@@ -162,11 +162,13 @@ EOF
     provisioner "remote-exec" {
         script = "bootstrap.bash"
     }
-
-    # output the public DNS name for ease of debugging
-    provisioner "local-exec" {
-        command = "echo ${self.public_dns} ${self.public_ip} ${self.instance_state}"
-        on_failure = continue
-    }
 }
 
+# after the terraformation, show the instances created and the LB
+output "Instances" {
+  value = "${aws_instance.gcapp.*.public_ip}"
+}
+
+output "LB" {
+  value = "${aws_elb.web.dns_name}"
+}
