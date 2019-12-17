@@ -7,3 +7,14 @@ package "nginx" do
     notifies :restart, 'service[nginx]', :delayed
     notifies :enable, 'service[nginx]', :delayed
 end
+
+file "/var/www/html/index.nginx-debian.html" do
+    action :delete
+end
+
+template "/var/www/html/index.html" do
+    source 'index.html.erb'
+    mode '0644'
+    owner 'root'
+    group 'root'
+end
