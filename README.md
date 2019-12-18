@@ -30,8 +30,8 @@ bash setup.sh
 ```
 After the chef-zero server has been created, you need to copy the DNS name to TWO places
 ```
-terraform_aws_demo/tf-gcapp.tf: server_url = "http://ec2-13-48-129-142.eu-north-1.compute.amazonaws.com:8889"
-~/.chef/knife.rb: chef_server_url 'http://ec2-13-48-129-142.eu-north-1.compute.amazonaws.com:8889'
+terraform_aws_demo/tf-gcapp.tf: server_url = "http://ec2-13-53-140-37.eu-north-1.compute.amazonaws.com:8889"
+~/.chef/knife.rb: chef_server_url 'http://ec2-13-53-140-37.eu-north-1.compute.amazonaws.com:8889'
 ```
 
 Note the public DNS name and reference it on your local ~/.chef/knife.rb with port 8889 - that's where chef-zero lives. Reference whatever RSA key file as your client_key. Chef-client needs it to function, but chef-zero doesn't check it.
@@ -42,7 +42,7 @@ Make sure your cookbook_path references the chefrepo/cookbooks directory.
 ```
 ssl_verify_mode :verify_none
 node_name 'whatever'
-chef_server_url 'http://ec2-13-48-129-142.eu-north-1.compute.amazonaws.com:8889'
+chef_server_url 'http://ec2-13-53-140-37.eu-north-1.compute.amazonaws.com:8889'
 client_key '~/.ssh/tf_gc.pem'
 cookbook_path ["~/dev/terraform_aws_demo/chefrepo/cookbooks"]
 ```
@@ -57,10 +57,10 @@ Instances = [
   "13.53.169.255",
   "13.53.192.8",
 ]
-LB = gcdemo-355339845.eu-north-1.elb.amazonaws.com
+LB = gcdemo-1754880613.eu-north-1.elb.amazonaws.com
 ```
 
-Then just visit the LB DNS on port 80 http://gcdemo-355339845.eu-north-1.elb.amazonaws.com/
+Then just visit the LB DNS on port 80 http://gcdemo-1754880613.eu-north-1.elb.amazonaws.com/
 ```
 User gc
 Password gcdemo

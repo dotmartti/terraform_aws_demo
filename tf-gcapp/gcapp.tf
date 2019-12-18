@@ -161,7 +161,7 @@ EOF
         #node_name       = self.public_dns # inside a local VPC one doesn't get an automatic DNS name
         node_name       = self.public_ip # but you get a public IP
         #secret_key      = "${file("../encrypted_data_bag_secret")}" # nothing secret in my chef right now
-        server_url      = "http://ec2-13-48-134-76.eu-north-1.compute.amazonaws.com:8889"
+        server_url      = "http://ec2-13-53-140-37.eu-north-1.compute.amazonaws.com:8889"
         recreate_client = true
         user_name       = "chef-bootstrap"
         user_key        = file("~/.ssh/tf_gc.pem")
