@@ -149,7 +149,8 @@ EOF
             "dnsname" : "${self.public_dns}",
             "chef_client": {
                 "init_style": "systemd",
-                "splay" : 180
+                "splay" : 10,
+                "interval": 60
             }
         }
         EOF
