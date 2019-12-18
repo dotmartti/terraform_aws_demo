@@ -54,10 +54,9 @@ data "aws_ami" "ubuntu" {
 
 # fake chef server with chef-zero
 resource "aws_instance" "chefserver" {
-    count           = 1
     ami             = data.aws_ami.ubuntu.id
     instance_type   = "t3.micro"
-    key_name        = "martti_gc"
+    key_name        = "tf_gc"
     security_groups = ["${aws_security_group.chefzero_sg.name}"]
 
     provisioner "remote-exec" {
@@ -65,14 +64,12 @@ resource "aws_instance" "chefserver" {
 
         connection {
             user = "ubuntu"
-            private_key = file("~/.ssh/martti_gc.pem")
+            private_key = file("~/.ssh/tf_gc.pem")
             host = self.public_ip
         }
     }
+}
 
-    # display the hostname at the end to save time for querying it afterwards
-    provisioner "local-exec" {
-        command = "echo ${self.public_dns} ${self.public_ip} ${self.instance_state}"
-        on_failure = continue
-    }
+output "ChefDNS" {
+    value      = "${aws_instance.chefserver.public_dns}"
 }

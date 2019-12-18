@@ -3,34 +3,35 @@ provider "aws" {
 }
 
 # Create a VPC to launch our instances into
-resource "aws_vpc" "default" {
+resource "aws_vpc" "gcvpc" {
   cidr_block = "10.0.0.0/16"
 }
 
 # Create an internet gateway to give our subnet access to the outside world
 resource "aws_internet_gateway" "default" {
-  vpc_id = aws_vpc.default.id
+  vpc_id = aws_vpc.gcvpc.id
 }
 
 # Grant the VPC internet access on its main route table
 resource "aws_route" "internet_access" {
-  route_table_id         = aws_vpc.default.main_route_table_id
+  route_table_id         = aws_vpc.gcvpc.main_route_table_id
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.default.id
 }
 
 # Create a subnet to launch our instances into
-resource "aws_subnet" "default" {
-  vpc_id                  = aws_vpc.default.id
+resource "aws_subnet" "gcsubnet" {
+  vpc_id                  = aws_vpc.gcvpc.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
+  availability_zone       = "eu-north-1c"
 }
 
 
 # A security group for the ELB so it is accessible via the web
 resource "aws_security_group" "elb" {
   description = "Separate SG for ELB"
-  vpc_id      = aws_vpc.default.id
+  vpc_id      = aws_vpc.gcvpc.id
 
   # HTTP access from anywhere
   ingress {
@@ -51,7 +52,7 @@ resource "aws_security_group" "elb" {
 
 resource "aws_security_group" "gcapp" {
     description = "SG for web servers"
-    vpc_id      = aws_vpc.default.id
+    vpc_id      = aws_vpc.gcvpc.id
 
     # ssh access from anywhere
     ingress {
@@ -97,7 +98,7 @@ resource "aws_security_group" "gcapp" {
 resource "aws_elb" "web" {
   name = "gcdemo"
 
-  subnets         = [ "${aws_subnet.default.id}" ]
+  subnets         = [ "${aws_subnet.gcsubnet.id}" ]
   security_groups = [ "${aws_security_group.elb.id}" ]
   instances       = aws_instance.gcapp.*.id
 
@@ -119,13 +120,14 @@ resource "aws_elb" "web" {
 
 resource "aws_instance" "gcapp" {
     count             = 3
-    #ami               = "ami-005bc7d72deb72a3d"
+    #ami               = "ami-005bc7d72deb72a3d" # Ubuntu 18.04 LTS amd64 bionic image build on 2019-11-13
     ami               = data.aws_ami.ubuntu.id
     instance_type     = "t3.micro"
-    key_name          = "martti_gc"
+    key_name          = "tf_gc"
     #security_groups   = ["${aws_security_group.gcapp.name}"] # this stopped working with VPC/ELB?
     vpc_security_group_ids = [ "${aws_security_group.gcapp.id}" ] # needed to use this parameter instead
-    subnet_id         = aws_subnet.default.id
+    subnet_id         = aws_subnet.gcsubnet.id
+    #availability_zone = "eu-north-1c"
 
     # TODO cannot upgrade the machine here, because this runs into a conflict with chef provisioner? Figure out later?
     user_data = <<-EOF
@@ -136,7 +138,7 @@ EOF
 
     connection {
         user = "ubuntu"
-        private_key = file("~/.ssh/martti_gc.pem")
+        private_key = file("~/.ssh/tf_gc.pem")
         host = self.public_ip
     }
 
@@ -155,13 +157,13 @@ EOF
         environment     = "_default"
         client_options  = ["chef_license 'accept'"]
         run_list        = ["role[webapp]"]
-        #node_name       = self.public_dns # inside a local VPC, I guess one doesn't get an automatic DNS name
+        #node_name       = self.public_dns # inside a local VPC one doesn't get an automatic DNS name
         node_name       = self.public_ip # but you get a public IP
         #secret_key      = "${file("../encrypted_data_bag_secret")}" # nothing secret in my chef right now
-        server_url      = "http://ec2-13-53-194-34.eu-north-1.compute.amazonaws.com:8889"
+        server_url      = "http://ec2-13-48-134-76.eu-north-1.compute.amazonaws.com:8889"
         recreate_client = true
         user_name       = "chef-bootstrap"
-        user_key        = file("~/.ssh/martti_gc.pem")
+        user_key        = file("~/.ssh/tf_gc.pem")
         #version         = "12.4.1" # in prod env, probably want to pin this
         ssl_verify_mode = ":verify_none"
     }

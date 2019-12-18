@@ -13,19 +13,24 @@ Create a Hello World static web page protected with basic authentication and run
 
 Have terraform (v0.12+) installed. Have knife installed.
 
-Have AWS credentials in the ~/.aws/credentials file. It is also used by Terraform.
-
-### chef-zero
-Setup the fake Chef server by chef-zero
+Have AWS CLI installed and credentials defined in the ~/.aws/credentials file. It is also used by Terraform.
+Create ssh key to access instances and also exploited by chef-zero setup.
 ```
-cd tf-chef-zero
-terraform plan
-terraform apply --auto-approve
+aws ec2 create-key-pair --key-name tf_gc --query 'KeyMaterial' --output text > ~/.ssh/tf_gc.pem
+chmod 400 ~/.ssh/tf_gc.pem
+```
+
+Then run setup script
+```
+bash setup.sh
+```
+After the chef-zero server has been created, you need to copy the DNS name to TWO places
+```
+terraform_aws_demo/tf-gcapp.tf: server_url = "http://ec2-13-48-129-142.eu-north-1.compute.amazonaws.com:8889"
+~/.chef/knife.rb: chef_server_url 'http://ec2-13-48-129-142.eu-north-1.compute.amazonaws.com:8889'
 ```
 
 Note the public DNS name and reference it on your local ~/.chef/knife.rb with port 8889 - that's where chef-zero lives. Reference whatever RSA key file as your client_key. Chef-client needs it to function, but chef-zero doesn't check it.
-
-### Upload Chef artefacts
 
 Make sure your cookbook_path references the chefrepo/cookbooks directory.
 
@@ -33,24 +38,9 @@ Make sure your cookbook_path references the chefrepo/cookbooks directory.
 ```
 ssl_verify_mode :verify_none
 node_name 'whatever'
-chef_server_url 'http://ec2-13-53-194-34.eu-north-1.compute.amazonaws.com:8889'
-client_key '~/.ssh/martti_gc.pem'
+chef_server_url 'http://ec2-13-48-129-142.eu-north-1.compute.amazonaws.com:8889'
+client_key '~/.ssh/tf_gc.pem'
 cookbook_path ["~/dev/terraform_aws_demo/chefrepo/cookbooks"]
-```
-
-Now you're ready to upload the contents of Chef server - webapp role and cookbooks.
-```
-cd ../chefrepo
-knife upload .
-```
-
-### Create the web application cluster
-
-And now you can create the web application on AWS.
-```
-cd ../tf-gcapp
-terraform plan
-terraform apply --auto-approve
 ```
 
 In the end of your run you should get a list of nodes bootstrapped and the LB DNS name. You might need to wait couple of minutes for the DNS configuration to propagate. 
@@ -59,9 +49,25 @@ In the end of your run you should get a list of nodes bootstrapped and the LB DN
 Outputs:
 
 Instances = [
-  "13.48.67.236",
-  "13.48.26.0",
-  "13.48.84.243",
+  "13.53.136.60",
+  "13.53.169.255",
+  "13.53.192.8",
 ]
-LB = gcdemo-441074539.eu-north-1.elb.amazonaws.com
+LB = gcdemo-1008886268.eu-north-1.elb.amazonaws.com
+```
+
+Then just visit the LB DNS on port 80 http://gcdemo-1008886268.eu-north-1.elb.amazonaws.com
+```
+User gc
+Password gcdemo
+```
+
+If you refresh the page, you should see the Hello World page with IP rotating though all three nodes.
+
+
+## Teardown
+
+Just run the script
+```
+bash destroy.sh
 ```
