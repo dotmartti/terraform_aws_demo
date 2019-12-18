@@ -11,9 +11,13 @@ Create a Hello World static web page protected with basic authentication and run
 
 ## Setup
 
-Have terraform (v0.12+) installed. Have knife installed.
+Prerequisites
+* AWS account to create EC2 artifacts
+* Terraform (v0.12+) installed
+* knife installed (gem install chef)
+* AWS CLI installed (apt install awscli or https://docs.aws.amazon.com/cli/latest/userguide/install-cliv1.html)
+* credentials defined in the ~/.aws/credentials file. It is also used by Terraform.
 
-Have AWS CLI installed and credentials defined in the ~/.aws/credentials file. It is also used by Terraform.
 Create ssh key to access instances and also exploited by chef-zero setup.
 ```
 aws ec2 create-key-pair --key-name tf_gc --query 'KeyMaterial' --output text > ~/.ssh/tf_gc.pem
@@ -53,10 +57,10 @@ Instances = [
   "13.53.169.255",
   "13.53.192.8",
 ]
-LB = gcdemo-1008886268.eu-north-1.elb.amazonaws.com
+LB = gcdemo-355339845.eu-north-1.elb.amazonaws.com
 ```
 
-Then just visit the LB DNS on port 80 http://gcdemo-1008886268.eu-north-1.elb.amazonaws.com
+Then just visit the LB DNS on port 80 http://gcdemo-355339845.eu-north-1.elb.amazonaws.com/
 ```
 User gc
 Password gcdemo
@@ -67,7 +71,7 @@ If you refresh the page, you should see the Hello World page with IP rotating th
 
 ## Teardown
 
-Just run the script
+Just run the script to destroy the webapp and chef-zero instances.
 ```
 bash destroy.sh
 ```
