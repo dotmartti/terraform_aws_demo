@@ -69,6 +69,14 @@ Password gcdemo
 If you refresh the page, you should see the Hello World page with IP rotating though all three nodes.
 
 
+## Example release
+Do changes in the cookbook and then upload it.
+```
+knife cookbook upload gcapp
+```
+And then wait for the chef interval time +- splay and you should see the result.
+
+
 ## Teardown
 
 Just run the script to destroy the webapp and chef-zero instances.
